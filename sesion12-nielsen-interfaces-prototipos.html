@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Sesión 12 — Heurísticas de Nielsen, Diseño de Interfaces y Prototipos · EGEL Plus</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0a0c10;--card:#12151e;--card2:#181c28;--border:#1e2436;--text:#c8cdd8;--text2:#7c8494;--white:#e8ecf4;--green:#22c55e;--green2:#15803d;--greenBg:rgba(34,197,94,.08);--red:#ef4444;--red2:#b91c1c;--redBg:rgba(239,68,68,.08);--blue:#3b82f6;--amber:#f59e0b;--amberBg:rgba(245,158,11,.08);--purple:#a78bfa;--cyan:#06b6d4;--orange:#f97316;--teal:#14b8a6}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;line-height:1.7;min-height:100vh}
+::selection{background:var(--teal);color:#fff}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-thumb{background:#2a3040;border-radius:3px}
+.shell{max-width:860px;margin:0 auto;padding:16px 14px 60px}
+.hdr{background:linear-gradient(135deg,#111422,#141e2e 50%,#121a2a);border:1px solid var(--border);border-radius:16px;padding:28px 24px;margin-bottom:20px;position:relative;overflow:hidden}
+.hdr::after{content:'';position:absolute;top:-60px;right:-60px;width:200px;height:200px;background:radial-gradient(circle,rgba(20,184,166,.07),transparent 70%);pointer-events:none}
+.hdr .tag{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:2.5px;color:var(--text2);margin-bottom:6px;text-transform:uppercase}
+.hdr h1{font-size:21px;font-weight:700;color:var(--white);margin-bottom:4px}
+.hdr p{font-size:13px;color:var(--text2)}
+.tabs{display:flex;gap:5px;margin-bottom:16px;flex-wrap:wrap}
+.tab{padding:9px 16px;border-radius:9px;border:1px solid var(--border);background:transparent;color:var(--text2);font-family:'DM Sans',sans-serif;font-size:12.5px;font-weight:500;cursor:pointer;transition:all .2s}
+.tab.active{background:var(--teal);color:#fff;border-color:var(--teal);font-weight:600}
+.tab:hover:not(.active){border-color:#3b4a6a;color:var(--white)}
+.section{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:22px;margin-bottom:12px;animation:fadeUp .3s ease both}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.section h2{font-size:17px;font-weight:700;color:var(--white);margin-bottom:12px}
+.section h3{font-size:14px;font-weight:600;color:var(--teal);margin:14px 0 6px}
+.section p,.section li{font-size:13.5px;line-height:1.75;color:var(--text)}
+.section ul,.section ol{padding-left:18px;margin:6px 0}.section li{margin-bottom:4px}
+.section strong{color:var(--white);font-weight:600}
+.ref{font-family:'DM Mono',monospace;font-size:10.5px;color:var(--text2);margin-top:10px;font-style:italic}
+.tip{background:var(--amberBg);border:1px solid rgba(245,158,11,.12);border-radius:8px;padding:10px 14px;margin:10px 0;font-size:12.5px}
+.tip strong{color:var(--amber)}
+.ex{background:rgba(20,184,166,.06);border:1px solid rgba(20,184,166,.12);border-radius:8px;padding:10px 14px;margin:10px 0;font-size:12.5px}
+.ex strong{color:var(--teal)}
+.vs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0}
+.vs>div{background:var(--card2);border-radius:8px;padding:10px 12px;font-size:12.5px;border:1px solid var(--border)}
+.vs h4{font-size:12px;font-weight:600;margin-bottom:4px}
+@media(max-width:600px){.vs{grid-template-columns:1fr}}
+.pbar{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 18px;margin-bottom:16px;display:flex;align-items:center;gap:14px}
+.pbar .track{flex:1;height:6px;background:#1a1f2e;border-radius:3px;overflow:hidden}
+.pbar .fill{height:100%;background:linear-gradient(90deg,var(--teal),var(--blue));border-radius:3px;transition:width .4s ease}
+.pbar .label{font-family:'DM Mono',monospace;font-size:12px;color:var(--text2);white-space:nowrap}
+.qcard{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:24px;margin-bottom:14px;animation:fadeUp .35s ease both}
+.qnum{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1.5px;color:var(--teal);margin-bottom:8px}
+.qtxt{font-size:15px;color:var(--white);font-weight:500;line-height:1.7;margin-bottom:6px;white-space:pre-line}
+.opts{display:grid;gap:8px}
+.opt{background:var(--card2);border:1.5px solid var(--border);border-radius:10px;padding:13px 16px;font-size:14px;color:var(--text);cursor:pointer;transition:all .2s;text-align:left;font-family:'DM Sans',sans-serif;line-height:1.6;display:flex;align-items:flex-start;gap:10px}
+.opt:hover:not(.locked){border-color:#3b4a6a;background:#1a1f30}
+.opt .letter{font-family:'DM Mono',monospace;font-weight:600;font-size:13px;color:var(--text2);min-width:22px;height:22px;display:flex;align-items:center;justify-content:center;border-radius:6px;background:rgba(255,255,255,.04);flex-shrink:0;margin-top:1px}
+.opt.correct{border-color:var(--green2);background:var(--greenBg)}.opt.correct .letter{background:var(--green);color:#fff}
+.opt.wrong{border-color:var(--red2);background:var(--redBg)}.opt.wrong .letter{background:var(--red);color:#fff}
+.opt.locked{cursor:default;opacity:.7}.opt.correct.locked{opacity:1}.opt.dimmed{opacity:.45}
+.fb{margin-top:14px;padding:16px;border-radius:10px;animation:fadeUp .3s ease both;font-size:13.5px;line-height:1.75}
+.fb.ok{background:var(--greenBg);border:1px solid rgba(34,197,94,.15)}.fb.ok .fb-tag{color:var(--green)}
+.fb.no{background:var(--redBg);border:1px solid rgba(239,68,68,.15)}.fb.no .fb-tag{color:var(--red)}
+.fb-tag{font-weight:700;font-size:12px;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;font-family:'DM Mono',monospace}
+.fb-text{color:var(--text)}.fb-ref{font-family:'DM Mono',monospace;font-size:11px;color:var(--text2);margin-top:8px}
+.fb-trap{margin-top:10px;padding:10px 12px;background:var(--amberBg);border:1px solid rgba(245,158,11,.12);border-radius:8px}
+.fb-trap .trap-tag{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;color:var(--amber);font-weight:600;margin-bottom:4px}
+.fb-trap p{font-size:12.5px;color:var(--text);line-height:1.6}
+.nav{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+.btn{padding:10px 20px;border-radius:9px;border:none;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s}
+.btn-primary{background:var(--teal);color:#fff}.btn-primary:hover{background:#0d9488}
+.btn-ghost{background:transparent;border:1px solid var(--border);color:var(--text2)}.btn-ghost:hover{border-color:#3b4a6a;color:var(--white)}
+.results{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:28px;animation:fadeUp .4s ease both}
+.results h2{font-size:20px;color:var(--white);margin-bottom:16px}
+.score-big{font-family:'DM Mono',monospace;font-size:48px;font-weight:700;margin-bottom:4px}
+.score-ok{color:var(--green)}.score-mid{color:var(--amber)}.score-bad{color:var(--red)}
+.modes{display:grid;gap:10px;margin-top:16px}
+.mode-btn{background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:18px 20px;cursor:pointer;transition:all .2s;text-align:left;font-family:'DM Sans',sans-serif}
+.mode-btn:hover{border-color:var(--teal);background:#131828}
+.mode-btn h3{font-size:15px;color:var(--white);margin-bottom:3px}.mode-btn p{font-size:12px;color:var(--text2)}
+.review-item{padding:12px 16px;background:var(--card2);border-radius:8px;margin-bottom:8px;font-size:13px;line-height:1.6}
+</style>
+</head>
+<body>
+<div class="shell" id="app"></div>
+<script>
+const theory=[
+{id:"ui-intro",title:"Diseño de interfaces: Fundamentos",icon:"🖥️",html:`
+<p>El <strong>diseño de interfaces de usuario (UI)</strong> se enfoca en cómo el usuario interactúa con el sistema. Según Pressman (2010), la UI es la "ventana al software" — si está mal diseñada, el usuario rechazará el sistema sin importar qué tan buena sea la lógica interna.</p>
+<h3>3 reglas de oro de Mandel</h3>
+<ol>
+<li><strong>Dejar al usuario en control:</strong> El usuario decide el ritmo, puede deshacer acciones, puede personalizar. Nunca forzar una secuencia rígida.</li>
+<li><strong>Reducir la carga de memoria del usuario:</strong> Mostrar información necesaria, no obligar a recordar datos de pantallas anteriores. Reconocer &gt; recordar.</li>
+<li><strong>Consistencia en la interfaz:</strong> Mismos patrones visuales, misma ubicación de elementos, misma terminología en toda la app.</li>
+</ol>
+<h3>Usabilidad vs UX</h3>
+<ul>
+<li><strong>Usabilidad:</strong> ¿Puede el usuario completar la tarea eficientemente y sin errores? Es MEDIBLE.</li>
+<li><strong>UX (Experiencia de Usuario):</strong> ¿Cómo se SIENTE el usuario al usar el sistema? Incluye usabilidad + emociones + satisfacción.</li>
+</ul>
+<div class="tip"><strong>⚡ EGEL:</strong> Si preguntan "qué principio dice que el usuario no debería memorizar datos entre pantallas" → Regla de Mandel #2 / Nielsen #6 (Reconocer antes que recordar). Si preguntan "quién propuso las 3 reglas de oro" → Mandel.</div>
+`,ref:"Pressman (2010) Cap. 11 · Sommerville (2011) Cap. 16 · Mandel (1997)"},
+
+{id:"nielsen-1-5",title:"Nielsen: Heurísticas 1–5",icon:"1️⃣",html:`
+<p><strong>Jakob Nielsen (1994)</strong> definió 10 heurísticas de usabilidad que son el estándar para evaluar interfaces. Son principios generales, no reglas rígidas.</p>
+<h3>H1 — Visibilidad del estado del sistema</h3>
+<p>El sistema debe mantener informado al usuario de qué está pasando, con retroalimentación oportuna.</p>
+<div class="ex"><strong>Ejemplo:</strong> Barra de progreso al subir un archivo. Spinner de carga. Indicador "Guardando..." al editar. Mensaje "3 de 10 pasos completados".</div>
+<div class="ex"><strong>Violación:</strong> Un botón "Enviar" que no muestra nada después de hacer clic. El usuario no sabe si funcionó o se trabó.</div>
+<h3>H2 — Coincidencia entre el sistema y el mundo real</h3>
+<p>Usar lenguaje del usuario, no jerga técnica. Seguir convenciones del mundo real. La información debe aparecer en orden natural y lógico.</p>
+<div class="ex"><strong>Ejemplo:</strong> Un e-commerce muestra "Carrito de compras" (concepto real), no "Buffer de transacciones". Ícono de papelera para borrar.</div>
+<div class="ex"><strong>Violación:</strong> Un error que dice "NullPointerException en línea 342" en vez de "No pudimos procesar tu solicitud".</div>
+<h3>H3 — Control y libertad del usuario</h3>
+<p>Los usuarios se equivocan. Necesitan una "salida de emergencia" clara: deshacer, rehacer, cancelar, volver atrás.</p>
+<div class="ex"><strong>Ejemplo:</strong> Gmail permite deshacer envío de email (5 segundos). Ctrl+Z en editores. Botón "Atrás" funcional.</div>
+<div class="ex"><strong>Violación:</strong> Un formulario de 10 pasos donde no puedes regresar. Borrar sin confirmación y sin recuperar.</div>
+<h3>H4 — Consistencia y estándares</h3>
+<p>Los usuarios no deberían preguntarse si diferentes palabras/acciones/situaciones significan lo mismo. Seguir convenciones de la plataforma.</p>
+<div class="ex"><strong>Ejemplo:</strong> Si "Guardar" usa ícono de disco en una pantalla, debe usar el mismo ícono en todas. Un link se ve como link en TODA la app.</div>
+<div class="ex"><strong>Violación:</strong> "Aceptar" en unas pantallas, "OK" en otras, "Confirmar" en otras. Botón azul que a veces es acción y a veces cancelar.</div>
+<h3>H5 — Prevención de errores</h3>
+<p>Mejor que un buen mensaje de error es un diseño que <strong>prevenga</strong> el error. Eliminar condiciones propensas a error o pedir confirmación.</p>
+<div class="ex"><strong>Ejemplo:</strong> Deshabilitar el botón "Enviar" hasta que el formulario sea válido. Autocompletado que evita errores de tipeo. Calendario en vez de campo de texto para fechas.</div>
+<div class="ex"><strong>Violación:</strong> Campo de texto libre para ingresar una fecha (el usuario puede poner "martes", "13/25/2024", etc.).</div>
+<div class="tip"><strong>⚡ EGEL:</strong> H5 (prevención) ≠ H9 (recuperación). H5 = ANTES de que ocurra el error (deshabilitar botón). H9 = DESPUÉS de que ocurra (mensaje claro para recuperarse). El EGEL los confunde a propósito.</div>
+`,ref:"Nielsen (1994) · Nielsen Norman Group · Pressman (2010) Cap. 11"},
+
+{id:"nielsen-6-10",title:"Nielsen: Heurísticas 6–10",icon:"6️⃣",html:`
+<h3>H6 — Reconocer antes que recordar</h3>
+<p>Minimizar la carga de memoria. Hacer visibles objetos, acciones y opciones. No obligar al usuario a recordar información de una pantalla a otra.</p>
+<div class="ex"><strong>Ejemplo:</strong> Menú desplegable con opciones visibles en vez de campo vacío donde recuerdas el código. Historial de búsquedas recientes. Breadcrumbs.</div>
+<div class="ex"><strong>Violación:</strong> "Ingrese el código de producto" sin lista de opciones. "Vuelva a la pantalla anterior para ver el ID del pedido".</div>
+<h3>H7 — Flexibilidad y eficiencia de uso</h3>
+<p>Aceleradores para usuarios expertos que no estorben a novatos. Permitir personalización de acciones frecuentes.</p>
+<div class="ex"><strong>Ejemplo:</strong> Atajos de teclado (Ctrl+S). Macros. "Acciones recientes". Doble clic como acceso rápido. Toolbar personalizable.</div>
+<div class="ex"><strong>Violación:</strong> No hay atajos de teclado. Todo requiere navegar 5 menús. Misma experiencia para novato y experto.</div>
+<h3>H8 — Diseño estético y minimalista</h3>
+<p>Cada unidad extra de información compite con la información relevante y disminuye su visibilidad relativa. Eliminar lo innecesario.</p>
+<div class="ex"><strong>Ejemplo:</strong> Google: solo un campo de búsqueda. Dashboard que muestra KPIs clave sin saturar de gráficas.</div>
+<div class="ex"><strong>Violación:</strong> Pantalla con 40 campos visibles cuando el usuario típico solo usa 5. Popups, banners y notificaciones compitiendo por atención.</div>
+<h3>H9 — Ayudar a reconocer, diagnosticar y recuperarse de errores</h3>
+<p>Los mensajes de error deben: expresarse en lenguaje claro (sin códigos técnicos), indicar QUÉ pasó, y sugerir CÓMO solucionarlo.</p>
+<div class="ex"><strong>Ejemplo:</strong> "El email ya está registrado. ¿Quieres iniciar sesión o recuperar tu contraseña?" en vez de "Error: duplicate key constraint".</div>
+<div class="ex"><strong>Violación:</strong> "Error 500". "Ha ocurrido un error inesperado" sin más contexto.</div>
+<h3>H10 — Ayuda y documentación</h3>
+<p>Aunque es mejor que el sistema se use sin documentación, puede ser necesario proveer ayuda. Debe ser fácil de buscar, enfocada en la tarea, con pasos concretos y concisa.</p>
+<div class="ex"><strong>Ejemplo:</strong> Tooltips contextuales. Centro de ayuda con búsqueda. "?" junto a campos complejos. Onboarding guiado la primera vez.</div>
+<div class="ex"><strong>Violación:</strong> Manual PDF de 200 páginas como única ayuda. Sin tooltips ni explicación en campos complejos.</div>
+<div class="tip"><strong>⚡ EGEL:</strong> Resumen rápido para identificar: H1=feedback, H2=lenguaje del usuario, H3=undo/salida, H4=consistencia, H5=prevenir error, H6=reconocer>recordar, H7=atajos/expertos, H8=minimalismo, H9=mensajes de error claros, H10=ayuda contextual.</div>
+`,ref:"Nielsen (1994) · Nielsen Norman Group · Pressman (2010) Cap. 11"},
+
+{id:"evaluacion-heuristica",title:"Evaluación heurística: Cómo se aplica",icon:"🔍",html:`
+<p>La <strong>evaluación heurística</strong> es un método de inspección de usabilidad donde <strong>evaluadores expertos</strong> revisan la interfaz contra las 10 heurísticas de Nielsen.</p>
+<h3>Proceso</h3>
+<ol>
+<li><strong>3 a 5 evaluadores</strong> independientes inspeccionan la interfaz (Nielsen demostró que 5 evaluadores encuentran ~75% de los problemas)</li>
+<li>Cada evaluador revisa solo, sin comunicarse con los demás</li>
+<li>Registran cada violación: qué heurística viola, dónde, severidad (0–4)</li>
+<li>Se consolidan los hallazgos en una sesión grupal</li>
+</ol>
+<h3>Escala de severidad</h3>
+<ul>
+<li><strong>0:</strong> No es problema de usabilidad</li>
+<li><strong>1:</strong> Cosmético — arreglar solo si sobra tiempo</li>
+<li><strong>2:</strong> Menor — baja prioridad</li>
+<li><strong>3:</strong> Mayor — importante arreglar, alta prioridad</li>
+<li><strong>4:</strong> Catástrofe — DEBE arreglarse antes de lanzar</li>
+</ul>
+<h3>Evaluación heurística vs prueba de usabilidad</h3>
+<div class="vs">
+<div><h4 style="color:var(--purple)">Evaluación heurística</h4><p>Expertos inspeccionan. Sin usuarios reales. Más rápida y barata. Encuentra problemas técnicos de usabilidad. Basada en PRINCIPIOS.</p></div>
+<div><h4 style="color:var(--cyan)">Prueba de usabilidad</h4><p>Usuarios REALES usan el sistema. Más costosa. Encuentra problemas de tareas reales. Basada en OBSERVACIÓN de usuarios.</p></div>
+</div>
+<div class="tip"><strong>⚡ EGEL:</strong> Si preguntan "¿quién evalúa en una evaluación heurística?" → expertos (3-5), NO usuarios. Si preguntan "¿quién participa en una prueba de usabilidad?" → usuarios REALES. Es la diferencia clave.</div>
+`,ref:"Nielsen (1994) · Nielsen & Molich (1990) · Pressman (2010) Cap. 11"},
+
+{id:"prototipos",title:"Prototipos: Tipos y propósitos",icon:"📱",html:`
+<p>Un <strong>prototipo</strong> es un modelo preliminar del sistema que permite explorar y validar requisitos, diseño o interacción antes de implementar.</p>
+<h3>Por fidelidad</h3>
+<div class="vs">
+<div><h4 style="color:var(--amber)">Lo-Fi (Baja fidelidad)</h4><p>Sketches en papel, wireframes, storyboards. Rápidos de crear. Ideales para explorar ideas tempranas. El usuario se enfoca en ESTRUCTURA y FLUJO, no en estética.</p></div>
+<div><h4 style="color:var(--blue)">Hi-Fi (Alta fidelidad)</h4><p>Prototipos interactivos con diseño visual final (Figma, InVision). Parecen el producto real. Ideales para validar experiencia y detalles visuales. Riesgo: el usuario cree que ya está listo.</p></div>
+</div>
+<h3>Por propósito</h3>
+<div class="vs">
+<div><h4 style="color:var(--green)">Desechable (throwaway)</h4><p>Se construye para explorar/validar requisitos y después SE DESCARTA. No se convierte en el producto final. Solo sirve para aprender.</p></div>
+<div><h4 style="color:var(--orange)">Evolutivo</h4><p>Se construye como base y se REFINA iterativamente hasta convertirse en el producto final. Cada iteración agrega funcionalidad real.</p></div>
+</div>
+<h3>Horizontal vs Vertical</h3>
+<ul>
+<li><strong>Horizontal:</strong> Muestra MUCHAS funciones pero sin profundidad. Navegas por todas las pantallas pero ninguna funciona realmente. Ideal para validar flujo general.</li>
+<li><strong>Vertical:</strong> Implementa UNA función completa con toda su profundidad. Pocas pantallas pero totalmente funcionales. Ideal para validar viabilidad técnica.</li>
+</ul>
+<div class="tip"><strong>⚡ EGEL:</strong> Desechable vs evolutivo es la pregunta clásica. Si el escenario dice "explorar requisitos inciertos y después construir desde cero" → desechable. Si dice "refinar progresivamente" → evolutivo. Horizontal = amplitud. Vertical = profundidad.</div>
+`,ref:"Sommerville (2011) Cap. 2.3 · Pressman (2010) Cap. 5 · SWEBOK v3.0"},
+
+{id:"wireframe-mockup",title:"Wireframe, Mockup, Prototipo interactivo",icon:"✏️",html:`
+<p>Son 3 niveles de representación de la UI, de menos a más detalle:</p>
+<h3>Wireframe</h3>
+<ul>
+<li>Esquema estructural en blanco y negro (o escala de grises)</li>
+<li>Muestra DÓNDE van los elementos: header, menú, contenido, footer, botones</li>
+<li>NO muestra colores, tipografía final, imágenes reales</li>
+<li>Es un "plano arquitectónico" de la pantalla</li>
+</ul>
+<h3>Mockup</h3>
+<ul>
+<li>Representación visual ESTÁTICA con diseño final: colores, tipografía, íconos, imágenes</li>
+<li>Parece la pantalla final pero NO es interactivo (no haces clic)</li>
+<li>Es como una "foto" de cómo se verá</li>
+</ul>
+<h3>Prototipo interactivo</h3>
+<ul>
+<li>Mockup CON interactividad: clics, transiciones, navegación entre pantallas</li>
+<li>Simula la experiencia real del usuario</li>
+<li>Herramientas: Figma, InVision, Adobe XD, Axure</li>
+</ul>
+<div class="tip"><strong>⚡ EGEL:</strong> Wireframe = estructura sin diseño. Mockup = diseño sin interacción. Prototipo = diseño con interacción. Si te preguntan qué usar para validar la UBICACIÓN de elementos → wireframe. Para validar la EXPERIENCIA → prototipo interactivo.</div>
+`,ref:"Pressman (2010) Cap. 11 · Sommerville (2011) Cap. 2.3"},
+
+{id:"accesibilidad",title:"Accesibilidad y diseño inclusivo",icon:"♿",html:`
+<p>La <strong>accesibilidad</strong> asegura que personas con discapacidades (visual, auditiva, motora, cognitiva) puedan usar el sistema. No es opcional — en muchos contextos es legalmente requerida.</p>
+<h3>WCAG (Web Content Accessibility Guidelines)</h3>
+<p>Estándar del W3C. Se basa en 4 principios (<strong>POUR</strong>):</p>
+<ul>
+<li><strong>Perceptible:</strong> La información debe poder percibirse. Texto alternativo en imágenes, subtítulos en videos, contraste suficiente.</li>
+<li><strong>Operable:</strong> La interfaz debe poder operarse. Navegable por teclado, sin dependencia del mouse, sin contenido que cause convulsiones.</li>
+<li><strong>Comprensible:</strong> La información y la UI deben ser entendibles. Lenguaje claro, comportamiento predecible, ayuda para errores.</li>
+<li><strong>Robusto:</strong> El contenido debe ser interpretable por diversas tecnologías asistivas (lectores de pantalla, etc.).</li>
+</ul>
+<h3>Niveles de conformidad</h3>
+<ul>
+<li><strong>A:</strong> Mínimo (elimina barreras más severas)</li>
+<li><strong>AA:</strong> Recomendado (estándar para sitios gubernamentales y empresariales)</li>
+<li><strong>AAA:</strong> Óptimo (difícil de lograr en todo el sitio)</li>
+</ul>
+<div class="tip"><strong>⚡ EGEL:</strong> Si te preguntan qué estándar define la accesibilidad web → WCAG del W3C. Si preguntan los principios → POUR (Perceptible, Operable, Comprensible, Robusto). El nivel más comúnmente requerido es AA.</div>
+`,ref:"W3C WCAG 2.1 · Pressman (2010) Cap. 11 · SWEBOK v3.0"},
+
+{id:"principios-diseno",title:"Principios de diseño de UI (Shneiderman + Norman)",icon:"🎨",html:`
+<h3>8 reglas de oro de Shneiderman</h3>
+<ol>
+<li><strong>Consistencia:</strong> Secuencias de acciones consistentes en situaciones similares (≈ Nielsen H4)</li>
+<li><strong>Atajos para expertos:</strong> Abreviaciones, teclas rápidas, macros (≈ Nielsen H7)</li>
+<li><strong>Retroalimentación informativa:</strong> Respuesta del sistema a cada acción (≈ Nielsen H1)</li>
+<li><strong>Diálogos con cierre:</strong> Secuencias de acciones con inicio, desarrollo y fin claro</li>
+<li><strong>Prevención de errores:</strong> Diseño que evite errores serios (≈ Nielsen H5)</li>
+<li><strong>Reversibilidad:</strong> Permitir deshacer acciones (≈ Nielsen H3)</li>
+<li><strong>Control interno:</strong> El usuario debe sentir que controla el sistema</li>
+<li><strong>Reducir carga de memoria:</strong> No obligar a memorizar (≈ Nielsen H6)</li>
+</ol>
+<h3>7 principios de Norman</h3>
+<p>Donald Norman (autor de "The Design of Everyday Things") propone: visibilidad, retroalimentación, restricciones, mapping (correspondencia), consistencia, affordance (el objeto sugiere cómo usarse) y modelo conceptual claro.</p>
+<div class="ex"><strong>Affordance:</strong> Un botón 3D "invita" a hacer clic. Un slider invita a deslizar. Un campo de texto invita a escribir. Si el usuario no sabe qué hacer con un elemento → falla el affordance.</div>
+<div class="tip"><strong>⚡ EGEL:</strong> Shneiderman y Nielsen se solapan mucho. La diferencia: Nielsen son HEURÍSTICAS para evaluar; Shneiderman son REGLAS para diseñar. Norman agrega el concepto de affordance: el objeto sugiere su uso sin instrucciones.</div>
+`,ref:"Shneiderman & Plaisant (2010) · Norman (2013) · Pressman (2010) Cap. 11"},
+
+{id:"resumen",title:"Resumen: Claves para el EGEL",icon:"📝",html:`
+<h3>10 Heurísticas de Nielsen — palabras clave</h3>
+<ul>
+<li><strong>H1 Visibilidad del estado:</strong> feedback, progreso, loading</li>
+<li><strong>H2 Coincidencia con mundo real:</strong> lenguaje del usuario, no jerga</li>
+<li><strong>H3 Control y libertad:</strong> undo, deshacer, salida de emergencia</li>
+<li><strong>H4 Consistencia:</strong> mismos patrones, convenciones de plataforma</li>
+<li><strong>H5 Prevención de errores:</strong> validar ANTES, deshabilitar, calendario</li>
+<li><strong>H6 Reconocer > recordar:</strong> opciones visibles, no memorizar</li>
+<li><strong>H7 Flexibilidad:</strong> atajos de teclado, personalización</li>
+<li><strong>H8 Diseño minimalista:</strong> solo lo necesario, sin ruido</li>
+<li><strong>H9 Recuperación de errores:</strong> mensajes claros + cómo solucionarlo</li>
+<li><strong>H10 Ayuda:</strong> documentación contextual, tooltips</li>
+</ul>
+<h3>Prototipos</h3>
+<ul>
+<li><strong>Lo-Fi / Hi-Fi:</strong> fidelidad visual</li>
+<li><strong>Desechable / Evolutivo:</strong> ¿se tira o se refina?</li>
+<li><strong>Horizontal / Vertical:</strong> amplitud vs profundidad</li>
+<li><strong>Wireframe → Mockup → Prototipo interactivo:</strong> niveles de detalle</li>
+</ul>
+<h3>Evaluaciones</h3>
+<ul>
+<li><strong>Heurística:</strong> EXPERTOS evalúan contra principios (3–5 evaluadores)</li>
+<li><strong>Prueba de usabilidad:</strong> USUARIOS reales realizan tareas</li>
+</ul>
+<h3>Accesibilidad</h3>
+<p><strong>POUR:</strong> Perceptible, Operable, Comprensible, Robusto. Nivel AA es el estándar.</p>
+`,ref:"Nielsen (1994) · Pressman (2010) Cap. 11 · Sommerville (2011) Cap. 16 · WCAG 2.1"}
+];
+
+const Q=[
+{n:1,q:"Un usuario hace clic en 'Procesar pago' y la pantalla se queda estática durante 8 segundos sin ninguna indicación visual. Después aparece un mensaje de éxito. ¿Heurística violada?",o:["H3 — Control y libertad del usuario.","H5 — Prevención de errores.","H1 — Visibilidad del estado del sistema.","H9 — Recuperación de errores."],c:2,x:"El sistema no informa al usuario qué está pasando durante la espera. Debería mostrar spinner, barra de progreso o mensaje 'Procesando...'. H1 exige retroalimentación oportuna sobre el estado actual.",ref:"Nielsen (1994)",trap:"A (H3) sería si el usuario no pudiera cancelar o salir. Aquí el problema no es falta de control sino falta de FEEDBACK sobre lo que está pasando."},
+
+{n:2,q:"Un sistema médico muestra el error: 'SQLException: ORA-12154: TNS could not resolve the connect identifier specified'. El usuario es una enfermera. ¿Heurísticas violadas?",o:["H1 y H4 — sin feedback y sin consistencia.","H2 y H9 — jerga técnica y sin ayuda para recuperarse.","H5 y H8 — no previno error y diseño saturado.","H7 y H10 — sin atajos y sin documentación."],c:1,x:"H2: usa jerga técnica (SQL, Oracle, TNS) en vez de lenguaje del usuario. H9: no indica QUÉ pasó en términos comprensibles ni CÓMO solucionarlo. Debería decir algo como 'No pudimos conectar al servidor. Contacte al administrador del sistema.'",ref:"Nielsen (1994)",trap:"C menciona prevención (H5) pero el error ya ocurrió — no se trata de prevenirlo sino de comunicarlo bien. El problema es CÓMO se presenta el error, no que haya ocurrido."},
+
+{n:3,q:"Un formulario de registro tiene un campo de texto libre para 'Fecha de nacimiento'. Los usuarios ingresan: '13/25/1990', 'martes', '1990-13-25', etc. El sistema acepta todo y después falla al procesar. ¿Heurística violada?",o:["H9 — Mal mensaje de error.","H5 — Prevención de errores.","H4 — Falta de consistencia.","H6 — Obliga a recordar el formato."],c:1,x:"H5 dice: mejor que un buen mensaje de error es un diseño que PREVENGA el error. Usar un DatePicker (calendario) en vez de campo de texto elimina la posibilidad de formato incorrecto. El error no debería poder ocurrir en primer lugar.",ref:"Nielsen (1994)",trap:"D (H6) también aplica parcialmente, pero el problema PRINCIPAL es que el diseño permite errores que son 100% prevenibles con un control de UI adecuado = H5."},
+
+{n:4,q:"Una app bancaria tiene un botón que dice 'Aceptar' en la pantalla de transferencias, 'OK' en pagos, 'Confirmar' en inversiones, y 'Proceder' en préstamos. Todos hacen lo mismo. ¿Heurística?",o:["H2 — No coincide con el mundo real.","H8 — Diseño no minimalista.","H4 — Inconsistencia y falta de estándares.","H1 — Falta de visibilidad del estado."],c:2,x:"H4: la misma acción tiene 4 nombres diferentes. El usuario no debería preguntarse si 'Aceptar', 'OK', 'Confirmar' y 'Proceder' significan lo mismo. Debe haber UN término consistente en toda la app.",ref:"Nielsen (1994)",trap:"A (H2) sería si usaran lenguaje técnico vs del usuario. Aquí el lenguaje es del usuario pero es INCONSISTENTE entre pantallas = H4."},
+
+{n:5,q:"Un equipo de 4 expertos en UX revisa independientemente la interfaz de un sistema de reservaciones, registra violaciones contra las 10 heurísticas de Nielsen, las clasifica por severidad y después se reúnen a consolidar. ¿Qué técnica aplicaron?",o:["Prueba de usabilidad con usuarios reales.","Test A/B con métricas de conversión.","Evaluación heurística.","Cognitive walkthrough."],c:2,x:"Evaluación heurística: expertos (3-5) revisan independientemente contra heurísticas, clasifican severidad, y consolidan. NO participan usuarios reales — eso sería prueba de usabilidad.",ref:"Nielsen & Molich (1990) · Nielsen (1994)",trap:"A suena similar pero en pruebas de usabilidad participan USUARIOS REALES haciendo tareas. Aquí son EXPERTOS inspeccionando contra principios = evaluación heurística."},
+
+{n:6,q:"Se construye un prototipo en papel con post-its para probar el flujo de navegación de una app de delivery. Se muestra a 5 usuarios, se recoge feedback sobre la estructura, y después se descarta. ¿Clasificación del prototipo?",o:["Hi-Fi, evolutivo, vertical.","Lo-Fi, desechable, horizontal.","Lo-Fi, evolutivo, horizontal.","Hi-Fi, desechable, vertical."],c:1,x:"Papel y post-its = Lo-Fi (baja fidelidad). Se descarta después de validar = desechable. Muestra el flujo general de navegación (muchas pantallas, sin profundidad) = horizontal.",ref:"Sommerville (2011) Cap. 2.3 · Pressman (2010) Cap. 5",trap:"C dice 'evolutivo' pero el enunciado dice explícitamente que se descarta. Si se descarta no evoluciona al producto final = desechable."},
+
+{n:7,q:"Un dashboard ejecutivo muestra 47 KPIs, 12 gráficas, 8 tablas, noticias del sector, clima local, cotización del dólar y un chat de soporte. Todo visible al mismo tiempo sin scroll. ¿Heurística violada?",o:["H6 — Obliga a recordar demasiado.","H8 — Diseño estético y minimalista.","H1 — Falta de visibilidad del estado.","H7 — Falta de flexibilidad."],c:1,x:"H8: cada unidad de información extra compite con la relevante. 47 KPIs + 12 gráficas + clima + chat saturan la pantalla. El diseño minimalista muestra solo lo necesario para la tarea del usuario.",ref:"Nielsen (1994)",trap:"A (H6) es sobre MEMORIA — recordar datos entre pantallas. Aquí todo está visible (no hay que memorizar) pero hay DEMASIADO visible = H8 (minimalismo)."},
+
+{n:8,q:"Un e-commerce permite buscar productos pero solo acepta el código SKU exacto (ej: 'PRD-48271-X'). No hay búsqueda por nombre ni categorías. El usuario debe consultar un catálogo externo para encontrar el SKU. ¿Heurística?",o:["H5 — No previene errores de tipeo.","H6 — Reconocer antes que recordar.","H2 — No coincide con mundo real.","H7 — Falta de atajos para expertos."],c:1,x:"H6: obliga al usuario a RECORDAR (o buscar externamente) un código críptico en vez de ofrecer opciones reconocibles (nombre del producto, imagen, categoría). Debería permitir buscar por nombre y mostrar resultados = reconocer en vez de recordar.",ref:"Nielsen (1994)",trap:"C (H2) tiene algo de razón (SKU es jerga interna) pero el problema central es que OBLIGA A RECORDAR un código en vez de ofrecer búsqueda reconocible = H6."},
+
+{n:9,q:"Un wizard de configuración de servidor tiene 15 pasos. En el paso 12, el usuario necesita cambiar algo del paso 3. No hay botón 'Atrás' ni forma de navegar a pasos anteriores — solo 'Siguiente'. Si cierra, pierde todo. ¿Heurísticas?",o:["H5 y H8 — prevención y minimalismo.","H3 y H1 — sin control/libertad y sin visibilidad del progreso.","H4 y H7 — inconsistencia y sin atajos.","H2 y H10 — jerga técnica y sin ayuda."],c:1,x:"H3: no hay 'salida de emergencia' — el usuario no puede regresar, deshacer, ni navegar libremente. H1: si no muestra en qué paso está (ej: 'Paso 12 de 15'), falta visibilidad del estado. Ambas se violan simultáneamente.",ref:"Nielsen (1994)",trap:"C menciona atajos (H7) pero atajos son para EFICIENCIA de expertos, no para navegación básica. El problema es falta de CONTROL (poder regresar) = H3."},
+
+{n:10,q:"¿Cuál es la diferencia CLAVE entre la evaluación heurística y la prueba de usabilidad?",o:["La heurística es más cara y lenta.","La heurística usa expertos contra principios; la prueba usa usuarios reales haciendo tareas.","La heurística solo sirve para web; la prueba para cualquier interfaz.","No hay diferencia real; son sinónimos."],c:1,x:"Evaluación heurística = EXPERTOS inspeccionan contra principios de Nielsen. Prueba de usabilidad = USUARIOS REALES realizan tareas mientras se observan. La primera es más rápida/barata; la segunda descubre problemas reales de uso.",ref:"Nielsen (1994) · Nielsen & Molich (1990)",trap:"A invierte la realidad: la evaluación heurística es MÁS barata que las pruebas con usuarios. D niega una diferencia fundamental."},
+
+{n:11,q:"Un desarrollador propone que el botón de 'Eliminar cuenta permanentemente' sea del mismo tamaño y color que 'Guardar cambios' y esté justo al lado. ¿Heurísticas que debería aplicar?",o:["H2 y H6 — lenguaje real y reconocimiento.","H5 y H3 — prevención de error y control/libertad.","H8 y H7 — minimalismo y eficiencia.","H1 y H4 — visibilidad y consistencia."],c:1,x:"H5: el diseño debería PREVENIR el error catastrófico (separar visualmente la acción destructiva, usar color rojo, pedir confirmación). H3: si el usuario lo presiona por error, necesita poder deshacer (periodo de gracia, confirmación, papelera).",ref:"Nielsen (1994)",trap:"D (H4 consistencia) podría justificar 'mismo estilo para todos los botones' pero eso es MALA consistencia — las acciones destructivas DEBEN diferenciarse visualmente por H5."},
+
+{n:12,q:"WCAG define 4 principios de accesibilidad web resumidos como POUR. ¿Qué significa la O?",o:["Original — contenido original, no copiado.","Operable — la interfaz debe poder operarse por teclado y sin dependencia del mouse.","Optimizado — rendimiento óptimo en todos los dispositivos.","Observable — se puede observar el estado del sistema."],c:1,x:"POUR = Perceptible, Operable, Comprensible, Robusto. Operable significa que toda la funcionalidad debe ser accesible por teclado, sin trampas de foco, con tiempo suficiente, y sin contenido que cause convulsiones.",ref:"W3C WCAG 2.1",trap:"D suena a Nielsen H1 (visibilidad del estado) pero no es un principio de WCAG. Las opciones A y C son inventadas."},
+
+{n:13,q:"Un cliente pide validar la viabilidad técnica de un módulo de procesamiento de pagos complejos antes de construir el resto del sistema. El prototipo debe implementar ese módulo completamente. ¿Tipo de prototipo?",o:["Horizontal — muestra muchas funciones.","Lo-Fi desechable — sketch rápido.","Vertical — una función con profundidad completa.","Evolutivo horizontal — se refina iterativamente."],c:2,x:"Implementar UNA función completa con toda su profundidad (procesamiento de pagos end-to-end) = prototipo VERTICAL. Sirve para validar viabilidad técnica de un módulo específico, no para mostrar el flujo general.",ref:"Pressman (2010) Cap. 5 · Sommerville (2011) Cap. 2.3",trap:"A (horizontal) muestra muchas funciones superficialmente. Aquí se necesita profundidad en UNA función = vertical."},
+
+{n:14,q:"Donald Norman acuñó un concepto que dice: un objeto bien diseñado sugiere cómo usarse sin necesidad de instrucciones. Un botón 3D 'invita' a hacer clic. Un tirador en una puerta 'invita' a jalar. ¿Concepto?",o:["Consistencia.","Visibilidad.","Affordance.","Mapping."],c:2,x:"Affordance = el objeto comunica su uso a través de su forma/apariencia. Un botón elevado invita a presionar. Un slider invita a deslizar. Si necesitas un letrero que diga 'empujar' en una puerta → falla el affordance.",ref:"Norman (2013) · Pressman (2010) Cap. 11",trap:"B (visibilidad) es que el elemento SEA visible. Affordance es que el elemento SUGIERA CÓMO usarse — son conceptos diferentes."},
+
+{n:15,q:"Nielsen demostró que para una evaluación heurística, existe un número óptimo de evaluadores que encuentra ~75% de los problemas de usabilidad. ¿Cuántos?",o:["1 — un experto senior es suficiente.","3 a 5 evaluadores independientes.","10 a 15 evaluadores para cubrir todo.","20+ evaluadores para resultados estadísticos."],c:1,x:"Nielsen demostró empíricamente que 5 evaluadores encuentran aprox. 75% de los problemas. Menos de 3 deja muchos sin descubrir. Más de 5 tiene rendimiento decreciente (encuentras los mismos problemas repetidos).",ref:"Nielsen (1994) · Nielsen & Molich (1990)",trap:"A es insuficiente (un evaluador encuentra ~35% de los problemas). C y D son excesivos y no costo-efectivos. 3-5 es el sweet spot demostrado empíricamente."}
+];
+
+const L=["A","B","C","D"];
+let S={view:"menu",pool:[],cur:0,ans:{},ti:0};
+function sh(a){let b=[...a];for(let i=b.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]];}return b;}
+function startQuiz(){S.pool=sh([...Q]);S.cur=0;S.ans={};S.view="quiz";render();window.scrollTo(0,0);}
+function pick(qi,oi){if(S.ans[qi]!==undefined)return;S.ans[qi]=oi;render();setTimeout(()=>{const e=document.getElementById('fb-'+qi);if(e)e.scrollIntoView({behavior:'smooth',block:'nearest'});},100);}
+function goTo(i){S.cur=i;render();window.scrollTo(0,0);}
+function finish(){S.view="results";render();window.scrollTo(0,0);}
+function goHome(){S.view="menu";render();window.scrollTo(0,0);}
+function showTheory(i){S.ti=i||0;S.view="theory";render();window.scrollTo(0,0);}
+
+function render(){
+  const a=document.getElementById('app');
+  if(S.view==="menu")return renderMenu(a);
+  if(S.view==="theory")return renderTheory(a);
+  if(S.view==="results")return renderResults(a);
+  if(S.view==="review")return renderReview(a);
+  renderQuiz(a);
+}
+function renderMenu(el){
+  el.innerHTML=`<div class="hdr"><div class="tag">SESIÓN 12 · MIÉRCOLES 2 ABRIL · SUBÁREA 2.3</div>
+  <h1>Heurísticas de Nielsen, Diseño de Interfaces y Prototipos</h1>
+  <p>10 heurísticas · Evaluación heurística · Lo-Fi/Hi-Fi · Desechable/Evolutivo · Wireframe/Mockup · WCAG · Shneiderman · Norman</p></div>
+  <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--text2);margin-bottom:12px">CONTENIDO</div>
+  <div class="modes">
+    <button class="mode-btn" onclick="showTheory(0)"><h3 style="color:var(--teal)">📖 Teoría</h3><p>${theory.length} fichas · Nielsen, Pressman, Sommerville, Norman, Shneiderman, WCAG</p></button>
+    <button class="mode-btn" onclick="startQuiz()" style="border-color:rgba(239,68,68,.25)"><h3 style="color:#ef4444">🧪 Quiz — 15 preguntas</h3><p>Escenarios difíciles con retroalimentación y análisis de trampa</p></button>
+  </div>`;
+}
+function renderTheory(el){
+  const t=theory[S.ti];
+  el.innerHTML=`<div class="hdr" style="padding:16px 22px"><div style="display:flex;justify-content:space-between;align-items:center">
+    <div><div class="tag">TEORÍA 2.3</div></div>
+    <button class="btn btn-ghost" onclick="goHome()" style="font-size:11px;padding:6px 12px">✕</button></div></div>
+  <div class="tabs">${theory.map((th,i)=>`<button class="tab ${i===S.ti?'active':''}" onclick="S.ti=${i};render();window.scrollTo(0,0)">${th.icon} ${th.title.length>14?th.title.substring(0,14)+'…':th.title}</button>`).join('')}</div>
+  <div class="section"><h2>${t.icon} ${t.title}</h2>${t.html}<div class="ref">📖 ${t.ref}</div></div>
+  <div class="nav">
+    ${S.ti>0?`<button class="btn btn-ghost" onclick="S.ti--;render();window.scrollTo(0,0)">← Anterior</button>`:''}
+    ${S.ti<theory.length-1?`<button class="btn btn-primary" onclick="S.ti++;render();window.scrollTo(0,0)">Siguiente →</button>`:''}
+    <button class="btn btn-ghost" onclick="startQuiz()" style="margin-left:auto">🧪 Quiz</button>
+  </div>`;
+}
+function renderQuiz(el){
+  const q=S.pool[S.cur],qi=S.cur,ad=S.ans[qi]!==undefined,ok=ad&&S.ans[qi]===q.c,t=S.pool.length,d=Object.keys(S.ans).length,p=Math.round((d/t)*100);
+  el.innerHTML=`<div class="hdr" style="padding:16px 22px"><div style="display:flex;justify-content:space-between;align-items:center">
+    <div><div class="tag">QUIZ 2.3</div></div>
+    <button class="btn btn-ghost" onclick="goHome()" style="font-size:11px;padding:6px 12px">✕</button></div></div>
+  <div class="pbar"><div class="label">${d}/${t}</div><div class="track"><div class="fill" style="width:${p}%"></div></div><div class="label">${p}%</div></div>
+  <div class="qcard"><div class="qnum">P${qi+1}/${t}</div><div class="qtxt">${q.q}</div>
+  <div class="opts">${q.o.map((o,i)=>{let c='opt';if(ad){c+=' locked';if(i===q.c)c+=' correct';else if(i===S.ans[qi]&&i!==q.c)c+=' wrong';else c+=' dimmed';}return`<button class="${c}" onclick="pick(${qi},${i})"><span class="letter">${L[i]}</span><span>${o}</span></button>`;}).join('')}</div>
+  ${ad?`<div class="fb ${ok?'ok':'no'}" id="fb-${qi}"><div class="fb-tag">${ok?'✓ CORRECTO':'✗ INCORRECTO — '+L[q.c]}</div><div class="fb-text">${q.x}</div><div class="fb-ref">📖 ${q.ref}</div>${q.trap?`<div class="fb-trap"><div class="trap-tag">⚠️ TRAMPA</div><p>${q.trap}</p></div>`:''}</div>`:''}</div>
+  <div class="nav">${qi>0?`<button class="btn btn-ghost" onclick="goTo(${qi-1})">←</button>`:''}${ad&&qi<t-1?`<button class="btn btn-primary" onclick="goTo(${qi+1})">Siguiente →</button>`:''}${ad&&qi===t-1?`<button class="btn btn-primary" onclick="finish()">Resultados</button>`:''}${d===t&&qi<t-1?`<button class="btn btn-primary" onclick="finish()" style="margin-left:auto">Resultados</button>`:''}</div>
+  <div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:16px">${S.pool.map((_,i)=>{const a=S.ans[i],ic=a!==undefined&&a===S.pool[i].c,iw=a!==undefined&&a!==S.pool[i].c;let bg=i===qi?'var(--teal)':ic?'var(--green)':iw?'var(--red)':'var(--card2)',bd=i===qi?'var(--teal)':ic?'var(--green2)':iw?'var(--red2)':'var(--border)';return`<button onclick="goTo(${i})" style="width:28px;height:28px;border-radius:6px;background:${bg};border:1px solid ${bd};color:${i===qi||a!==undefined?'#fff':'var(--text2)'};font-size:11px;font-family:'DM Mono',monospace;cursor:pointer;display:flex;align-items:center;justify-content:center">${i+1}</button>`;}).join('')}</div>`;
+}
+function renderResults(el){
+  const t=S.pool.length,c=Object.entries(S.ans).filter(([k,v])=>v===S.pool[+k].c).length,p=Math.round((c/t)*100),cls=p>=80?'score-ok':p>=60?'score-mid':'score-bad';
+  const wrong=S.pool.filter((_,i)=>S.ans[i]!==undefined&&S.ans[i]!==S.pool[i].c);
+  el.innerHTML=`<div class="results"><h2>Resultados — Sesión 12</h2><div class="score-big ${cls}">${c}/${t}</div><div style="font-size:14px;color:var(--text2);margin-bottom:20px">${p}%</div>
+  ${wrong.length>0?`<div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--text2);margin:16px 0 10px">FALLASTE</div>${wrong.map(q=>`<div class="review-item"><div style="color:var(--white);font-weight:500">P${q.n}. ${q.q.substring(0,80)}...</div><div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--green);margin-top:4px">→ ${L[q.c]}: ${q.o[q.c]}</div></div>`).join('')}`:'<div style="color:var(--green);font-size:15px;margin:20px 0">🎉 Perfecto</div>'}
+  <div class="nav" style="margin-top:20px"><button class="btn btn-ghost" onclick="S.view='review';render();window.scrollTo(0,0)">📋 Revisar</button><button class="btn btn-ghost" onclick="showTheory(0)">📖 Teoría</button><button class="btn btn-primary" onclick="goHome()">🏠</button></div></div>`;
+}
+function renderReview(el){
+  el.innerHTML=`<div class="hdr" style="padding:16px 22px"><div style="display:flex;justify-content:space-between;align-items:center"><div><div class="tag">REVISIÓN</div></div><button class="btn btn-ghost" onclick="finish()" style="font-size:11px;padding:6px 12px">←</button></div></div>
+  ${S.pool.map((q,i)=>{const a=S.ans[i],ok=a!==undefined&&a===q.c;return`<div class="qcard"><div class="qnum" style="display:flex;justify-content:space-between"><span>P${q.n}</span><span style="color:${ok?'var(--green)':'var(--red)'};font-weight:600">${ok?'✓':'✗'}</span></div><div class="qtxt" style="font-size:13px">${q.q}</div><div style="margin-top:8px;font-size:12px">${!ok?`<div style="color:var(--red)">Tuya: ${L[a]} — ${q.o[a]}</div>`:''}
+  <div style="color:var(--green)">→ ${L[q.c]}: ${q.o[q.c]}</div></div><div style="margin-top:6px;font-size:11px;color:var(--text2);line-height:1.6">${q.x}</div></div>`;}).join('')}
+  <div class="nav" style="margin-top:14px"><button class="btn btn-primary" onclick="goHome()">🏠</button></div>`;
+}
+render();
+</script>
+</body>
+</html>
